@@ -1,26 +1,69 @@
 package com.dsa.practice.controller;
 
-import com.dsa.practice.service.OfferService;
-import org.hibernate.jdbc.Work;
+import com.dsa.practice.dto.EmployeeResponse;
+import com.dsa.practice.model.Employee;
+import com.dsa.practice.service.PaymentService;
+import com.dsa.practice.util.Offer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @RestController
 @ControllerAdvice
 @RequestMapping("/api/test")
 public class Testontroller {
 
+    @Autowired
+    private PaymentService paymentService; // User @Primary -> paypal
+
+//    @Autowired
+//    @Qualifier("stripe")
+//    private PaymentService paymentService1; // User @Qualifier -> stripe
     @GetMapping("/test")
     public void test(
-            @RequestParam String test,
-            @RequestParam String test2
+//            @RequestParam Integer n
     ){
-        OfferService percert = amount -> amount - (amount * 0.10);
+        List<Employee> empList = Arrays.asList(
+                new Employee(1L, "srikanth", 80000d, "it", true),
+                new Employee(2L, "sagar", 60000d, "it", true),
+                new Employee(3L, "sachin", 30000d, "hr", true),
+                new Employee(4L, "vishal", 50000d, "hr", true)
+        );
 
-        System.out.println(percert.apply(1000));
+        List<EmployeeResponse> getAllEmp = empList.stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment))
+                .entrySet()
+                .stream()
+                .map(entity -> {
+                    List<Employee> value = entity.getValue();
+                    Employee allEmpList = value.stream()
+                            .max(Comparator.comparing(Employee::getSalary))
+                            .orElseThrow(() -> new IllegalStateException("No Employee Found"));
+
+                    return new EmployeeResponse(
+                            allEmpList.getId(),
+                            allEmpList.getName(),
+                            allEmpList.getSalary(),
+                            entity.getKey(),
+                            value.size()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        System.out.println(getAllEmp);
+
+//        Map<String, Employee> collect = empList.stream()
+//                .collect(Collectors.groupingBy(
+//                        Employee::getDepartment,
+//                        Collectors.collectingAndThen(
+//                                Collectors.maxBy(Comparator.comparing(Employee::getSalary)),
+//                                Optional::get
+//                        )
+//                ));
+//
+//        System.out.println(collect);
     }
 
 
@@ -42,9 +85,231 @@ public class Testontroller {
 
 
 
+    @GetMapping("/findHighestPaidEmployeeByDepartmentAndCount")
+    public void findHighestPaidEmployeeByDepartmentAndCount(
+            @RequestParam String name
+    ){
+        List<Employee> empList = Arrays.asList(
+                new Employee(1L, "srikanth", 80000d, "it", true),
+                new Employee(2L, "sagar", 60000d, "it", true),
+                new Employee(3L, "sachin", 30000d, "hr", true),
+                new Employee(4L, "vishal", 50000d, "hr", true)
+        );
 
+        List<EmployeeResponse> noEmployeeForDepartment = empList.stream()
+                .filter(emp -> emp.isFlag())
+                .collect(Collectors.groupingBy(Employee::getDepartment))
+                .entrySet() // map the methos
+                .stream()
+                .map(entry -> {
+                    List<Employee> list = entry.getValue();
+                    Employee highestPaidEmp = list.stream()
+                            .max(Comparator.comparing(Employee::getSalary))
+                            .orElseThrow(() ->
+                                    new IllegalStateException("No employee for department"));
 
+                    return new EmployeeResponse(
+                            highestPaidEmp.getId(),
+                            highestPaidEmp.getName(),
+                            highestPaidEmp.getSalary(),
+                            entry.getKey(),
+                            list.size()
+                    );
+                })
+                .collect(Collectors.toList());
 
+        System.out.println(noEmployeeForDepartment);
+    }
+
+    @GetMapping("/sortEMployeeBySalaryInDesceding")
+    public void sortEMployeeBySalaryInDesceding(
+            @RequestParam String name
+    ){
+        List<Employee> empList = Arrays.asList(
+                new Employee(1L, "srikanth", 80000d, "it", true),
+                new Employee(2L, "sagar", 60000d, "it", true),
+                new Employee(3L, "sachin", 30000d, "hr", true),
+                new Employee(4L, "vishal", 50000d, "hr", true)
+        );
+
+        List<Employee> collect = empList.stream()
+                .filter(emp -> emp.isFlag())
+                .collect(
+                        Collectors.groupingBy(
+                                Employee::getDepartment,
+                                Collectors.collectingAndThen(
+                                        Collectors.maxBy(Comparator.comparing(Employee::getSalary)),
+                                        Optional::get
+                                )
+                        ))
+                .values() // it will return value of map
+                .stream()
+                .sorted(Comparator.comparing(Employee::getId))
+                .collect(Collectors.toList());
+
+        System.out.println(collect);
+    }
+
+    @GetMapping("/employeeSortWithSalary")
+    public void employeeSortWithSalary(
+            @RequestParam Integer test
+    ){
+        List<Employee> col = Arrays.asList(
+                new Employee(1L, "srikanth", 80000d, "it", true),
+                new Employee(2L, "sagar", 60000d, "it", true),
+                new Employee(3L, "sachin", 30000d, "hr", true),
+                new Employee(4L, "vishal", 50000d, "hr", true)
+        );
+
+        List<Employee> getCol = col.stream()
+                .sorted(Comparator.comparing(Employee::getSalary).reversed())
+                .collect(Collectors.toList());
+
+        System.out.println(getCol);
+    }
+
+    @GetMapping("/findSecondLargestNumber")
+    public void findSecondLargestNumber(
+            @RequestParam Integer test
+    ){
+        List<Integer> inp = Arrays.asList(11,2,42,61,14,23,26,71,9,10,68,11);
+        Integer max = Integer.MIN_VALUE;
+        Integer secondMax = Integer.MIN_VALUE;
+
+        for (int num: inp){
+            if (num > max){
+                secondMax = max;
+                max = num;
+            } else if (num > secondMax && num != max){
+                secondMax = num;
+            }
+            System.out.println(secondMax);
+        }
+
+//        List<Integer> inp = Arrays.asList(11,2,42,61,14,23,26,71,9,10,68,11);
+//
+//        inp.stream()
+//                .skip(1)
+//                .max(Integer::compareTo)
+//                .get();
+
+    }
+
+    @GetMapping("/checkPrimeNumber")
+    public void checkPrimeNumber(
+            @RequestParam Integer test
+    ){
+        System.out.println(test+"is prime?"+ isPrime(test));
+    }
+
+    public static boolean isPrime(Integer n){
+        if (n <= 1) return false;
+
+        for (int i=2;i<n;i++){
+            if(n % i == 0) return false;
+        }
+        return true;
+    }
+
+    @GetMapping("/fibonacciSeries")
+    public void fibonacciSeries(
+            @RequestParam String test,
+            @RequestParam String test2
+    ){
+        int n = 10;
+        int a=0,b=1;
+
+        System.out.println(a);
+        System.out.println(b);
+
+        for (int i=2;i<n;i++){
+            int c=a+b;
+            System.out.println(" "+ c);
+            a = b;
+            b = c;
+        }
+    }
+
+    @GetMapping("/lamda-with-functional-interface")
+    public void lamdaWithFunctionalInterface(
+            @RequestParam String test,
+            @RequestParam String test2
+    ){
+        Offer percent = amount -> amount - (amount * 0.10);
+
+        System.out.println(percent.apply(1000));
+    }
+
+    @GetMapping("/removeDuplicateCharectoresFromString")
+    public void removeDuplicateCharectoresFromString(
+            @RequestParam String test,
+            @RequestParam String test2
+    ){
+        List<List<String>> list = Arrays.asList(
+                Arrays.asList("java", "java1", "java2"),
+                Arrays.asList("java4", "java3", "java2"),
+                Arrays.asList("java5", "java1", "java2")
+        );
+
+        List<String> collect = list.stream()
+                .flatMap(List::stream)
+                .distinct()
+                .collect(Collectors.toList());
+
+        System.out.println(collect);
+    }
+
+    @GetMapping("/department-with-salary")
+    public void departmentWithSalary(
+            @RequestParam String test,
+            @RequestParam String test2
+    ){
+//        10000 10% 20000 20% 30000 30 30000 > 40
+        List<Employee> getList = Arrays.asList(
+                new Employee(1L,"srikanth",10000d,"it",true),
+                new Employee(2L,"sagar",20000d,"it",true),
+                new Employee(3L,"sachin",30000d,"hr",true),
+                new Employee(4L,"mithlesh",40000d,"it",true)
+        );
+//        System.out.println(getList);
+        List<Employee> collect = getList.stream()
+                .map(emp -> {
+                    Double salary = emp.getSalary();
+                    Double deduct;
+                    if (salary <= 1000) {
+                        deduct = salary * 10 / 100d;
+                    } else {
+                        deduct = salary * 10 / 100d;
+                    }
+                    emp.setSalary(salary - deduct);
+                    return emp;
+                })
+                .collect(Collectors.toList());
+
+        System.out.println(collect);
+    }
+
+    @GetMapping("/first-non-repeating-charector")
+    public void firstNonRepeatingCharector(
+            @RequestParam String test,
+            @RequestParam String test2
+    ){
+        String str = "developer";
+        Map<String,Integer> arr = new HashMap<>();
+        for (int i=0;i<str.length();i++){
+            String ch = Character.toString(str.charAt(i));
+            arr.put(ch,arr.getOrDefault(ch,0) + 1);
+        }
+        System.out.println(arr);
+        // Step 2: Find first non-repeating character
+        for (int i = 0; i < str.length(); i++) {
+            String ch = Character.toString(str.charAt(i));
+            if (arr.get(ch) == 1) {
+                System.out.println("First non-repeating character: " + ch);
+                break;
+            }
+        }
+    }
 
     @GetMapping("/odd-even")
     public void oddEvenFirstLetter(){
@@ -104,36 +369,35 @@ public class Testontroller {
 
     @GetMapping("/max-number")
     public void maxNumber(){
-        List<Integer> inp = Arrays.asList(1,4,45,7,82,4,6,5,8);
-        Integer max = inp.get(0);
-        for (int i=1;i<inp.size();i++){
-            if (inp.get(i) > max){
-                max = inp.get(i);
+        // Option 1
+//        List<Integer> col = Arrays.asList(1,4,6,80,7,6);
+//        Integer maxNum = col.get(0);
+//        for (int i=0;i<col.size();i++){
+//            Integer nm = col.get(i);
+//            if (maxNum < nm){
+//                maxNum = nm;
+//            }
+//        }
+//        System.out.println(maxNum);
+
+        // Option 2
+//        List<Integer> col = Arrays.asList(1,4,6,80,7,6);
+//        Integer max = col.stream()
+//                .max(Integer::compareTo)
+//                .get();
+//        System.out.println(max);
+
+        // Option 3
+        String inp = "1,4,5,9,6,7,5,3,4,95,45";
+        String[] arr = inp.split(",");
+        Integer max = Integer.parseInt(arr[0]);
+        for (int i=0;i<arr.length;i++){
+            Integer getNum = Integer.parseInt(arr[i]);
+            if (max < getNum){
+                max = getNum;
             }
         }
         System.out.println(max);
-
-//        Option 2
-//        String str = "2,1,5,4,58,65,2,4,6";
-//        String[] inp = str.split(",");
-//        Long max = Long.parseLong(inp[0]);
-//
-//        for (int i=0;i<inp.length;i++){
-//            Long getMax = Long.parseLong(inp[i]);
-//            if(getMax > max){
-//                max = getMax;
-//            }
-//        }
-//        System.out.println(max);
-
-//        Option - 3
-//        List<Integer> inp = Arrays.asList(1,4,5,4,65,8,4,5,98,7);
-//        Integer max = inp.stream()
-//                .max(Integer::compare) // method reference
-//              .max((a,b) -> Integer.compare(a,b))
-//                .get();
-//
-//        System.out.println(max);
     }
 
 //    get only start with 1
@@ -299,7 +563,7 @@ public class Testontroller {
 //        Integer temp = a;
 //        a = b;
 //        b = c;
-//        c = a;
+//        c = test;
 //        System.out.println("after swap : a= "+a+" b ="+b+" c "+ c);
 
 //        with additon and substraction
@@ -328,5 +592,107 @@ public class Testontroller {
 //        c = a^b^c;
 //        a = a^b^c;
 //        System.out.println("Input a="+a+" b="+b+" c="+ c);
+    }
+
+    @GetMapping("/highest-salry-of-department")
+    public List<Map<String, Object>> highestSalaryOfDepartment(
+            @RequestParam String test,
+            @RequestParam String test2
+    ){
+
+        List<Map<String,Object>> employees = new ArrayList<>();
+
+        Map<String,Object> emp1 = new HashMap<>();
+        emp1.put("firstname","srikanth");
+        emp1.put("salary",1000);
+        emp1.put("department","it");
+
+        Map<String,Object> emp2 = new HashMap<>();
+        emp2.put("firstname","sagar");
+        emp2.put("salary",2000);
+        emp2.put("department","management");
+
+        Map<String,Object> emp3 = new HashMap<>();
+        emp3.put("firstname","raju");
+        emp3.put("salary",4000);
+        emp3.put("department","hr");
+
+
+        Map<String,Object> emp4 = new HashMap<>();
+        emp4.put("firstname","sachine");
+        emp4.put("salary",3000);
+        emp4.put("department","hr");
+
+        employees.add(emp1);
+        employees.add(emp2);
+        employees.add(emp3);
+        employees.add(emp4);
+
+
+//        List<Map<String, Object>> itEmployees = employees.stream()
+//                .filter(emp -> "it".equals(emp.get("department")))
+//                .collect(Collectors.toList());
+
+//        Map<Object, List<Map<String, Object>>> col = employees.stream()
+//                .collect(Collectors.groupingBy(emp -> emp.get("department")));
+        List<Map<String, Object>> collect = employees.stream()
+                .collect(Collectors.groupingBy(
+                        emp -> emp.get("department"),
+                        Collectors.collectingAndThen(
+                                Collectors.maxBy(Comparator.comparing(emp -> (Integer) emp.get("salary"))),
+                                Optional::get
+                        )
+                ))
+                .values()
+                .stream()
+                .collect(Collectors.toList());
+
+        return collect;
+
+        // get highest salary emp data as per the department
+//        List<Employee> getData = Arrays.asList(
+//                new Employee(1L,"srikanth",2000d,"it",true),
+//                new Employee(2L,"sachin",1000d,"it",true),
+//                new Employee(3L,"migthesh",1500d,"hr",true),
+//                new Employee(4L,"sagar",3000d,"hr",true)
+//        );
+//
+//        List<Employee> collect = getData.stream()
+//                .collect(Collectors.groupingBy(
+//                        Employee::getDepartment,
+//                        Collectors.collectingAndThen(
+//                                Collectors.maxBy(Comparator.comparing(Employee::getSalary)),
+//                                Optional::get
+//                        )
+//                ))
+//                .values()
+//                .stream()
+//                .collect(Collectors.toList());
+
+    }
+
+    @GetMapping("/longest-substring-without-repeating-characters")
+    public void longestSubstringWithoutRepeatingCharacters()
+    {
+        String s = "abcabcbkdjshbb";
+        int start = 0;
+        int maxLength = 0;
+        int maxStart = 0;
+        Map<Character, Integer> map = new HashMap<>();
+
+        for (int i = 0; i < s.length(); i++) {
+            char ch = s.charAt(i);
+            if (map.containsKey(ch) && map.get(ch) >= start) {
+                start = map.get(ch) + 1; // move start to exclude repeating character
+            }
+            map.put(ch, i);
+            if (i - start + 1 > maxLength) {
+                maxLength = i - start + 1;
+                maxStart = start;
+            }
+        }
+
+        String longestSubstring = s.substring(maxStart, maxStart + maxLength);
+        System.out.println("Longest substring without repeating characters: " + longestSubstring);
     }
 }

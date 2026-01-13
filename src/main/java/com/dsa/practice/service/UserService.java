@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import javax.swing.text.html.Option;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,5 +70,9 @@ public class UserService {
             throw new ResourceNotFoundException("No users found in city " + city);
         }
         return filteredByUser;
+    }
+
+    public Optional<User> getUserByName(String email){
+        return userRepository.getUserByEmail(email);
     }
 }

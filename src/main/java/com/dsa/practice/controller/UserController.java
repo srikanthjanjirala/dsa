@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/user")
@@ -46,5 +47,10 @@ public class UserController {
     @GetMapping("/city/{city}")
     public List<User> getUserByCity(@PathVariable String city){
         return userService.getUserByCity(city);
+    }
+
+    @GetMapping("/find-by-email")
+    public Optional<User> GetUserWithName(@RequestParam String email){
+        return userService.getUserByName(email);
     }
 }
