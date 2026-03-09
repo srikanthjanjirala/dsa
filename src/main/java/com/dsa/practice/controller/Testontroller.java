@@ -7,6 +7,7 @@ import com.dsa.practice.util.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,45 +26,7 @@ public class Testontroller {
     public void test(
 //            @RequestParam Integer n
     ){
-        List<Employee> empList = Arrays.asList(
-                new Employee(1L, "srikanth", 80000d, "it", true),
-                new Employee(2L, "sagar", 60000d, "it", true),
-                new Employee(3L, "sachin", 30000d, "hr", true),
-                new Employee(4L, "vishal", 50000d, "hr", true)
-        );
 
-        List<EmployeeResponse> getAllEmp = empList.stream()
-                .collect(Collectors.groupingBy(Employee::getDepartment))
-                .entrySet()
-                .stream()
-                .map(entity -> {
-                    List<Employee> value = entity.getValue();
-                    Employee allEmpList = value.stream()
-                            .max(Comparator.comparing(Employee::getSalary))
-                            .orElseThrow(() -> new IllegalStateException("No Employee Found"));
-
-                    return new EmployeeResponse(
-                            allEmpList.getId(),
-                            allEmpList.getName(),
-                            allEmpList.getSalary(),
-                            entity.getKey(),
-                            value.size()
-                    );
-                })
-                .collect(Collectors.toList());
-
-        System.out.println(getAllEmp);
-
-//        Map<String, Employee> collect = empList.stream()
-//                .collect(Collectors.groupingBy(
-//                        Employee::getDepartment,
-//                        Collectors.collectingAndThen(
-//                                Collectors.maxBy(Comparator.comparing(Employee::getSalary)),
-//                                Optional::get
-//                        )
-//                ));
-//
-//        System.out.println(collect);
     }
 
 
@@ -84,6 +47,37 @@ public class Testontroller {
 
 
 
+
+    @GetMapping("/checkIsBalenced")
+    public void checkIsBalanced(
+//            @RequestParam Integer n
+    ){
+        List<String> arr = Arrays.asList("{[()]}","]{()]}");
+
+        for (String val : arr){
+            System.out.println(isBalanced(val));
+        }
+    }
+
+    public static boolean isBalanced(String s){
+        Deque<Character> stack = new ArrayDeque<>();
+        Map<Character, Character> pair =  Map.of(
+                ')','(',
+                '}','{',
+                ']','['
+        );
+        for (char ch: s.toCharArray()){
+            if(ch == '(' || ch == '{' || ch == '['){
+                stack.push(ch);
+            } else if (ch == ')' || ch == '}' || ch == ']'){
+                if (stack.isEmpty() || stack.peek() != pair.get(ch)){ // peek to get a top element
+                    return false;
+                }
+                stack.pop(); // return the top element and remove the top element
+            }
+        }
+        return stack.isEmpty();
+    }
 
     @GetMapping("/findHighestPaidEmployeeByDepartmentAndCount")
     public void findHighestPaidEmployeeByDepartmentAndCount(
