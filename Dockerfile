@@ -1,5 +1,5 @@
 # Use Java 21 (AWS optimized)
-FROM amazoncorretto:21
+FROM amazoncorretto:21-alpine
 
 WORKDIR /app
 
