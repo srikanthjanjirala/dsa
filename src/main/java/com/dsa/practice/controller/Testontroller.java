@@ -2,13 +2,17 @@ package com.dsa.practice.controller;
 
 import com.dsa.practice.dto.EmployeeResponse;
 import com.dsa.practice.model.Employee;
+import com.dsa.practice.model.EmployeeAgeGender;
+import com.dsa.practice.model.Gender;
 import com.dsa.practice.service.PaymentService;
+import com.dsa.practice.util.DiscountCalculator;
 import com.dsa.practice.util.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Array;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,7 +30,22 @@ public class Testontroller {
     public void test(
 //            @RequestParam Integer n
     ){
+//        List<Employee> list = Arrays.asList(
+//                new Employee(1L, "srikanth", 20000d, "IT", true),
+//                new Employee(2L, "sachine", 30000d, "HR", true),
+//                new Employee(3L, "mithesh", 15000d, "IT", true),
+//                new Employee(4L, "sagar", 40000d, "HR", true),
+//                new Employee(6L, "sumanth", 40000d, "IT", true)
+//        );
 
+        Integer a=20,b=30,c=40;
+
+        Integer temp = a;
+
+        a=b;
+        b=c;
+        c=temp;
+        System.out.println("A "+ a + " B "+ b + " c " + c);
     }
 
 
@@ -47,6 +66,98 @@ public class Testontroller {
 
 
 
+    @GetMapping("/sumTheMultipliedElementsAndReturnSum")
+    public void sumTheMultipliedElementsAndReturnSum(){
+
+//        Integer[] in = {8, 3, 6, 1, -2, 0, 9};
+//        List<Integer> collect = Arrays.stream(in)
+//                .map(num -> {
+//                    if (num <= 0) {
+//                        return num;
+//                    } else if (num % 2 == 0) {
+//                        return num * 2;
+//                    } else {
+//                        return num * 3;
+//                    }
+//                }).collect(Collectors.toList());
+//
+//        System.out.println(collect);
+
+        Integer[] in = {8, 3, 6, 1, -2, 0, 9};
+
+        List<Integer> arr = new ArrayList<>();
+        for (Integer num: in){
+            if (num <= 0) {
+                arr.add(0);
+            } else if (num % 2 == 0){
+                arr.add(num * 2);
+            } else {
+                arr.add(num *  3);
+            }
+        }
+        System.out.println(arr);
+    }
+
+    @GetMapping("/pairSumProblem20")
+    public void pairSumProblem20(){
+        Integer[] arr = {12,2,4,-6,8,16,18,26};
+        Integer pair = 20;
+        Set<Integer> set = new HashSet<>();
+        for (int num : arr){
+            int target = pair - num;
+            System.out.println(target+" + "+ num + " = "+ pair);
+        }
+        System.out.println(set);
+
+//        Integer[] arr = {12,2,4,-6,8,16,18,26};
+//        Integer pair = 20;
+//        List<String> collect = Arrays.stream(arr)
+//                .map(num -> {
+//                    Integer target = pair - num;
+//
+//                    return target + " = " + num + " = " + " pair ";
+//                })
+//                .collect(Collectors.toList());
+//
+//        System.out.println(collect);
+    }
+
+    @GetMapping("/streamCountMaleFemalAverageSalaryYoungestEmployee")
+    public void streamCountMaleFemalAverageSalaryYoungestEmployee(
+//            @RequestParam Integer n
+    ){
+        List<EmployeeAgeGender> employees = Arrays.asList(
+                new EmployeeAgeGender(1l,"srikanth",30, Gender.MALE, 1000d),
+                new EmployeeAgeGender(2l,"sagar",25, Gender.FEMALE, 2000d),
+                new EmployeeAgeGender(3l,"sachine",28, Gender.MALE, 3000d),
+                new EmployeeAgeGender(4l,"mithlesh",32, Gender.MALE, 4000d)
+        );
+
+
+//         Map<Gender, Long> genderCount = employees.stream()
+//                .collect(Collectors.groupingBy(
+//                        EmployeeAgeGender::getGender,
+//                        Collectors.counting()
+//                ));
+//         System.out.println(genderCount);
+
+
+//        Map<Gender, Double> avgSalary = employees.stream()
+//                .collect(Collectors.groupingBy(
+//                        EmployeeAgeGender::getGender,
+//                        Collectors.averagingDouble(EmployeeAgeGender::getSalary)
+//                ));
+//
+//        avgSalary.replaceAll((k,v) -> Math.round(v * 100.0) / 100.0); // Round to 2 decimal places
+//
+//        System.out.println(avgSalary);
+
+//        EmployeeAgeGender employeeAgeGender = employees.stream()
+//                .min(Comparator.comparing(EmployeeAgeGender::getAge))
+//                .orElse(null);
+//
+//        System.out.println(employeeAgeGender);
+    }
 
     @GetMapping("/checkIsBalenced")
     public void checkIsBalanced(
