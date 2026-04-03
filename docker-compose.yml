@@ -7,10 +7,11 @@ services:
       - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: temp_db
     #      MYSQL_DATABASE: livestock_microservices_user
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/mysql:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "mysql", "-uroot", "-proot"]
       interval: 10s
@@ -23,103 +24,17 @@ services:
     ports:
       - "6379:6379"
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
-    container_name: elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+  app:
+    build: .
+    container_name: dsa-app
+    restart: always
     ports:
-      - "9200:9200"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9200/_cluster/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.12.1
-    container_name: logstash
-    ports:
-      - "5044:5044"   # Microservices send logs here
-    volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-    depends_on:
-      - elasticsearch
-
-  api-gateway-service:
-    build:
-      context: ./api-gateway-service
-      dockerfile: Dockerfile
-    container_name: api-gateway-service
-    ports:
-      - "8080:8080"   # ✅ ONLY public service
-    depends_on:
-      user-service:
-        condition: service_started
-      livestock-service:
-        condition: service_started
-      payment-service:
-        condition: service_started
-      notification-service:
-        condition: service_started
-      eureka-server:
-        condition: service_started
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka
-
-  kibana:
-    image: docker.elastic.co/kibana/kibana:8.12.1
-    container_name: kibana
-    ports:
-      - "5601:5601"
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    environment:
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-
-  user-service:
-    build:
-      context: ./user-service
-      dockerfile: Dockerfile
-    container_name: user-service
     depends_on:
       mysql:
         condition: service_healthy
-      zipkin:
-        condition: service_started
-      logstash:
-        condition: service_started
-    ports:
-      - "8081:8081"
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/livestock_microservices_user?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      # Zipkin configuration
-      SPRING_ZIPKIN_BASE_URL: http://zipkin:9411
-      SPRING_SLEUTH_SAMPLER_PROBABILITY: 1.0
-      LOGSTASH_HOST: logstash
-      LOGSTASH_PORT: 5044
-  #
-  eureka-server:
-    #    image: eureka-server
-    build:
-      context: ./eureka-server
-      dockerfile: Dockerfile
-    container_name: eureka-service
-    ports:
-      - "8761:8761"
-
-  zipkin:
-    image: openzipkin/zipkin:2.24
-    container_name: zipkin
-    ports:
-      - "9411:9411"
 
 volumes:
   mysql_data:
