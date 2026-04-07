@@ -1,7 +1,11 @@
 package com.dsa.practice.controller;
 
+import com.dsa.practice.dto.CourseIdsRequest;
+import com.dsa.practice.model.Role;
 import com.dsa.practice.model.User;
+import com.dsa.practice.repository.RoleRepository;
 import com.dsa.practice.service.UserService;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,18 +13,27 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/user")
+@AllArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping
     public ResponseEntity<User> saveUser(@RequestBody User user){
         User savedUser = userService.saveUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    }
+
+    @PostMapping("/{userId}/courses")
+    public ResponseEntity<User> assignCourses(
+            @PathVariable Long userId,
+            @RequestBody CourseIdsRequest request) {
+        User updatedUser = userService.assignCourses(userId, request.getCourseIds());
+        return ResponseEntity.ok(updatedUser);
     }
 
     @GetMapping
