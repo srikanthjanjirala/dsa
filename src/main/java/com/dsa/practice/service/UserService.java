@@ -1,5 +1,6 @@
 package com.dsa.practice.service;
 
+import com.dsa.practice.dto.UserDTO;
 import com.dsa.practice.enums.RoleName;
 import com.dsa.practice.exception.ResourceNotFoundException;
 import com.dsa.practice.model.Course;
@@ -52,13 +53,36 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found id with "+ id));
     }
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll().stream()
+    public List<UserDTO> getAllUsers(){
+        return userRepository.findAllUsersWithRelations()
+                .stream()
+                .map(this::convert)
+                .toList();
+//        return userRepository.findAll();
+//                .stream()
 //                .sorted(Comparator.comparing(User::getCity).reversed())
-                .sorted(Comparator.comparing(User::getCity))
-                .toList(); // thread safe // faster // java 16 + // immutable(not changable)
+//                .sorted(Comparator.comparing(User::getCity))
+//                .toList(); // thread safe // faster // java 16 + // immutable(not changable)
 //                .collect(Collectors.toList()); // not thread safe // slower // java 8 // mutable(changable)
 //                .collect(Collectors.toSet()); // immutable // java 8
+    }
+
+    private UserDTO convert(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getEmail(),
+                user.getCity(),
+                user.getDepartment(),
+                user.getRole() != null ? user.getRole().getName().name() : null,
+                user.getProfile() != null ? user.getProfile().getAddress() : null,
+                user.getProfile() != null ? user.getProfile().getPhone() : null,
+                user.getCourses()
+                        .stream()
+                        .map(Course::getCourseName)
+                        .collect(Collectors.toSet())
+        );
     }
 
     public User updateUser(Long id, User updatedUser){

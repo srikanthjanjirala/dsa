@@ -8,6 +8,7 @@ import com.dsa.practice.service.PaymentService;
 import com.dsa.practice.util.DiscountCalculator;
 import com.dsa.practice.util.Offer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.comparator.Comparators;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Array;
@@ -23,29 +24,65 @@ public class Testontroller {
     @Autowired
     private PaymentService paymentService; // User @Primary -> paypal
 
-//    @Autowired
-//    @Qualifier("stripe")
-//    private PaymentService paymentService1; // User @Qualifier -> stripe
     @GetMapping("/test")
     public void test(
 //            @RequestParam Integer n
     ){
-//        List<Employee> list = Arrays.asList(
-//                new Employee(1L, "srikanth", 20000d, "IT", true),
-//                new Employee(2L, "sachine", 30000d, "HR", true),
-//                new Employee(3L, "mithesh", 15000d, "IT", true),
-//                new Employee(4L, "sagar", 40000d, "HR", true),
-//                new Employee(6L, "sumanth", 40000d, "IT", true)
-//        );
+//        HashMap<String, Integer> map = new HashMap<>();
+//        map.put("Apple", 10);
+//        map.put("Banana", 20);
+//        map.put("Cherry", 30);
+//        map.put("Mango", 50);
+//
+//        for (String key : map.keySet()) {
+//            System.out.println(key + " -> " + key.hashCode());
+//        }
 
-        Integer a=20,b=30,c=40;
+        System.out.println("Apple".hashCode());
+        System.out.println("Banana".hashCode());
+        System.out.println("Cherry".hashCode());
+        System.out.println("Watermelon".hashCode());
 
-        Integer temp = a;
 
-        a=b;
-        b=c;
-        c=temp;
-        System.out.println("A "+ a + " B "+ b + " c " + c);
+
+//        Apple -> 63476538
+//        Cherry -> 2017321401
+//        Mango -> 74109858
+//        Banana -> 1982479237
+    }
+
+    public boolean isValidName(String name){
+        if (name == null || name.isEmpty()) return false;
+        if (name.length() < 2) return false;
+        if (name.matches("[a-zA-z ]+")) return  false;
+        return true;
+    }
+
+    public boolean isValidMail(String email){
+        if (email == null || email.trim().isEmpty()){
+            return false;
+        }
+        String[] split = email.split("@");
+        String localPart = split[0];
+        String domainPart = split[1];
+
+        System.out.println(domainPart.matches("[a-zA-Z ]]+"));
+        int i = domainPart.lastIndexOf(".");
+//        System.out.println("Last index of - "+ domainPart.substring(i) );
+//        if (localPart.isEmpty() || localPart.contains(" ") || localPart.contains("+") || localPart.contains("=") || localPart.contains("!")){
+//            return false;
+//        }
+
+
+//        if (!localPart.contains(".") || domainPart.contains(".com")){
+//
+//        }
+
+//        System.out.println("Local Part - "+localPart);
+//        System.out.println("Domain part - "+domainPart);
+
+
+        return true;
     }
 
 
@@ -65,6 +102,58 @@ public class Testontroller {
 
 
 
+
+
+
+
+
+
+
+
+
+
+    @GetMapping("/compressCharectorFromString")
+    public void compressCharectorFromString(){
+        String str = "a3c3d4e";
+        StringBuilder out = new StringBuilder();
+        for (int i=0;i<str.length();i++){
+
+            char ch = str.charAt(i);
+            if (i + 1 < str.length() &&  Character.isDigit(str.charAt(i + 1))){
+                int count =  Character.getNumericValue(str.charAt(i + 1));
+                for (int j=0; j<count; j++){
+                    out.append(ch);
+                }
+                i++;
+            } else {
+                out.append(ch);
+            }
+        }
+        System.out.println(out);
+    }
+
+    @GetMapping("/kThSmallestTest")
+    public void kThSmallestTest(
+//            @RequestParam Integer n
+    ){
+
+//        System.out.println(isValidMail("srikanth@gmail.com"));
+        List<Integer> inp = Arrays.asList(12,356,7,8,5,3,2);
+        kThSmallest(inp);
+    }
+
+    public void kThSmallest(List<Integer> inp){
+        Queue<Integer> pqueue = new PriorityQueue<>();
+        for (int val:inp){
+            pqueue.offer(val); //
+        }
+
+//        pqueue.addAll(inp);
+//        for (int i=1;i<3;i++){
+//            pqueue.poll();
+//        }
+//        System.out.println(pqueue.peek());
+    }
 
     @GetMapping("/sumTheMultipliedElementsAndReturnSum")
     public void sumTheMultipliedElementsAndReturnSum(){

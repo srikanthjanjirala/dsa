@@ -38,4 +38,5 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"), // foreign key to User
             inverseJoinColumns = @JoinColumn(name = "course_id") // foreign key to Course
     )
-    private Set<Course> courses = new HashSet<>();}
+    private Set<Course> courses = new HashSet<>();
+}

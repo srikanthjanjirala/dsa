@@ -1,6 +1,7 @@
 package com.dsa.practice.controller;
 
 import com.dsa.practice.dto.CourseIdsRequest;
+import com.dsa.practice.dto.UserDTO;
 import com.dsa.practice.model.Role;
 import com.dsa.practice.model.User;
 import com.dsa.practice.repository.RoleRepository;
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getUsers(){
+    public List<UserDTO> getUsers(){
         return  userService.getAllUsers();
     }
 
