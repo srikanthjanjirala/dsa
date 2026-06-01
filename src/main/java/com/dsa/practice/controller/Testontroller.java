@@ -5,15 +5,14 @@ import com.dsa.practice.model.Employee;
 import com.dsa.practice.model.EmployeeAgeGender;
 import com.dsa.practice.model.Gender;
 import com.dsa.practice.service.PaymentService;
-import com.dsa.practice.util.DiscountCalculator;
 import com.dsa.practice.util.Offer;
+import org.hibernate.query.Order;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.comparator.Comparators;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Array;
+import javax.smartcardio.ATR;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @RestController
@@ -26,29 +25,71 @@ public class Testontroller {
 
     @GetMapping("/test")
     public void test(
-//            @RequestParam Integer n
+            @RequestParam Integer n
     ){
-//        HashMap<String, Integer> map = new HashMap<>();
-//        map.put("Apple", 10);
-//        map.put("Banana", 20);
-//        map.put("Cherry", 30);
-//        map.put("Mango", 50);
-//
-//        for (String key : map.keySet()) {
-//            System.out.println(key + " -> " + key.hashCode());
-//        }
+        List<Integer> arr = Arrays.asList(1,2,3,6);
 
-        System.out.println("Apple".hashCode());
-        System.out.println("Banana".hashCode());
-        System.out.println("Cherry".hashCode());
-        System.out.println("Watermelon".hashCode());
+        Integer max = arr.stream().max(Integer::compareTo).get();
 
+        Set<Integer> set = new HashSet<>();
+        for (Integer num: arr){
+            set.add(num);
+        }
+        System.out.println(set);
+        for (int i=0;i<=max;i++){
+
+        }
+    }
 
 
-//        Apple -> 63476538
-//        Cherry -> 2017321401
-//        Mango -> 74109858
-//        Banana -> 1982479237
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @GetMapping("/removeDuplicateCharecters")
+    public void removeDuplicateCharecters(
+            @RequestParam Integer n
+    ){
+        String str = "programming";
+        StringBuilder strb = new StringBuilder();
+        for (int i=0;i<str.length();i++){
+            String ch = String.valueOf(str.charAt(i));
+            if (strb.indexOf(ch) == -1){
+                strb.append(ch);
+            }
+        }
+        System.out.println(strb);
+    }
+
+    @GetMapping("/sort-by-number-input")
+    public void sortByNumberInput(
+            @RequestParam Integer n
+    ){
+        List<String> arr = Arrays.asList("Two_2", "Three_3", "Five_5", "Seven_7", "Eleven_11");
+
+        List<String> out = arr.stream()
+                .sorted(Comparator.comparing(c ->  Integer.parseInt(c.substring(c.indexOf("_") + 1))))
+                .collect(Collectors.toList());
     }
 
     public boolean isValidName(String name){
@@ -80,8 +121,6 @@ public class Testontroller {
 
 //        System.out.println("Local Part - "+localPart);
 //        System.out.println("Domain part - "+domainPart);
-
-
         return true;
     }
 
@@ -387,6 +426,11 @@ public class Testontroller {
 //                .max(Integer::compareTo)
 //                .get();
 
+//        List<Integer> inp = Arrays.asList(11,2,42,61,14,23,26,71,9,10,68,11);
+//        Queue<Integer> pqueue = new PriorityQueue<>(Collections.reverseOrder());
+//        pqueue.addAll(inp);
+//        pqueue.poll();
+//        System.out.println(pqueue.peek());
     }
 
     @GetMapping("/checkPrimeNumber")
@@ -503,6 +547,30 @@ public class Testontroller {
                 break;
             }
         }
+
+//        String str = "a2b3c4";
+//        StringBuilder strb = new StringBuilder();
+//        for (int i=0;i<str.length();i+=2){
+//            Character ch = str.charAt(i);
+//            Integer count = Integer.parseInt(String.valueOf(str.charAt(i+1)));
+//            for (int j=0;j<count;j++){
+//                strb.append(ch);
+//            }
+//        }
+//        System.out.println(strb);
+
+//        String str = "aaabbbcccka";
+//        Integer count = 1;
+//        List<String> arr = new ArrayList<>();
+//        for (int i=1;i<=str.length();i++){
+//            if (i < str.length() && str.charAt(i) == str.charAt(i - 1)){
+//                count++;
+//            } else {
+//                arr.add(str.charAt(i-1)+" = "+ count);
+//                count = 1;
+//            }
+//        }
+//        System.out.println(arr);
     }
 
     @GetMapping("/odd-even")
@@ -521,6 +589,18 @@ public class Testontroller {
         }
         System.out.println(out);
 
+//        String str = "my name is srikanth";
+//        int[] index = {0};
+//        List<String> collect = Arrays.stream(str.split("\\s+"))
+//                .map(word -> {
+//                    if (index[0]++ % 2 == 0) {
+//                        return word.toLowerCase();
+//                    } else {
+//                        return word.toUpperCase();
+//                    }
+//                })
+//                .collect(Collectors.toList());
+//        System.out.println(collect);
     }
 
     @GetMapping("/reverse-string")
@@ -531,6 +611,20 @@ public class Testontroller {
             out.append(inp.charAt(i));
         }
         System.out.println(out);
+
+//        String str = "developer";
+//        String out = "";
+//        for(int i=str.length() - 1;i>=0;i--){
+//            out += str.charAt(i);
+//        }
+//        System.out.println(out);
+
+        // used to combine all stream elements into a single value
+//        String s = Arrays.stream(str.split(""))
+//                .reduce((a, b) -> b + a)
+//                .get();
+
+//        System.out.println(s);
     }
 
     @GetMapping("/count-string")
@@ -592,6 +686,15 @@ public class Testontroller {
             }
         }
         System.out.println(max);
+
+//        String str = "1,2,34,5,6,8,89,5";
+//
+//        String[] arr = str.split(",");
+//
+//        Arrays.stream(arr)
+//                .map(Integer::parseInt)
+//                .max(Integer::compareTo)
+//                .get();
     }
 
 //    get only start with 1
@@ -786,6 +889,15 @@ public class Testontroller {
 //        c = a^b^c;
 //        a = a^b^c;
 //        System.out.println("Input a="+a+" b="+b+" c="+ c);
+
+//        Swap two numbers
+//        List<Integer> inp = Arrays.asList(12,3,5,678,3,2,5,7,2);
+//        for (int i=0;i<inp.size();i+=2){
+//            Integer temp = inp.get(i);
+//            inp.set(i, inp.get(i+ 1));
+//            inp.set(i+1, temp);
+//        }
+//        System.out.println(inp);
     }
 
     @GetMapping("/highest-salry-of-department")

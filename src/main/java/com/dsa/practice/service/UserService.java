@@ -138,4 +138,8 @@ public class UserService {
         user.setCourses(courses);
         return userRepository.save(user);
     }
+
+//    public Option<User> getUserByEmail(String email){
+//        return userRepository.getUserByEmailTest(email);
+//    }
 }

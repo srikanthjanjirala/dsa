@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -67,4 +68,9 @@ public class UserController {
     public Optional<User> GetUserWithName(@RequestParam String email){
         return userService.getUserByName(email);
     }
+
+//    @GetMapping("/test/find-by-email")
+//    public Option<User> getEmailWithName(@RequestParam String email){
+//        return userService.getUserByEmail(email);
+//    }
 }
