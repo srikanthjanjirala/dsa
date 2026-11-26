@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.smartcardio.ATR;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,47 +25,141 @@ public class Testontroller {
     private PaymentService paymentService; // User @Primary -> paypal
 
     @GetMapping("/test")
-    public void test(
-            @RequestParam Integer n
-    ){
-        List<Integer> arr = Arrays.asList(1,2,3,6);
+    public void test(){
+        List<Integer> arr = Arrays.asList(9,4,6,8,3,2,5);
 
-        Integer max = arr.stream().max(Integer::compareTo).get();
+        quickSortTestTest(arr,0,arr.size() - 1);
+        System.out.println(arr);
+    }
 
-        Set<Integer> set = new HashSet<>();
-        for (Integer num: arr){
-            set.add(num);
+    public void quickSortTestTest(List<Integer> arr, Integer low,Integer high){
+        if (low < high){
+            Integer pivotIndex = partitionTest(arr,low,high);
+
+            quickSortTestTest(arr,low,pivotIndex -1);
+            quickSortTestTest(arr,pivotIndex+1,high);
         }
-        System.out.println(set);
-        for (int i=0;i<=max;i++){
+    }
 
+    public Integer partitionTest(List<Integer> arr,Integer low,Integer high){
+        Integer pivot = arr.get(high);
+        Integer i = low -1;
+        for (int j=low;j<high;j++){
+            if (arr.get(j) <= pivot){
+                i++;
+
+                //swap elements
+                Integer temp = arr.get(i);
+                arr.set(i,arr.get(j));
+                arr.set(j,temp);
+            }
         }
+
+        Integer temp = arr.get(i+1);
+        arr.set(i+1,arr.get(high));
+        arr.set(high,temp);
+
+        return i+1;
     }
 
 
 
+//    // quick sort
+//    @GetMapping("/test")
+//    public void test(
+//            @RequestParam Integer n
+//    ){
+//        List<Integer> arr = Arrays.asList(5,2,8,1,3,4,9);
+//        System.out.println("Step 1");
+//        quickSortTestTest(arr,0,arr.size() - 1);
+//
+//        System.out.println("Sorted Array: "+ arr);
+//    }
+//    public void quickSortTestTest(List<Integer> arr,Integer low, Integer high){
+//        if (low < high){
+//            System.out.println("low  "+ low + " high "+ high);
+//            System.out.println("Step 2");
+//            Integer pivotIndex = partitionTest(arr,low,high);
+//            System.out.println("Step 3"+ " pivotIndex: "+ pivotIndex);
+//            quickSortTestTest(arr,low,pivotIndex -1);
+//            System.out.println("Step 5");
+//            System.out.println("Test Test1"+ arr+ " pivotIndex: "+ pivotIndex);
+//            quickSortTestTest(arr,pivotIndex +1,high);
+//            System.out.println("Step 6");
+//            System.out.println("Test Test2"+ arr+" pivotIndex: "+ pivotIndex);
+//        }
+//    }
+//
+//    public Integer partitionTest(List<Integer> arr, Integer low,Integer high){
+//        Integer pivot = arr.get(high);
+//        System.out.println("Pivot: "+ pivot+ " arr: "+ arr);
+//        System.out.println("Step 5");
+//        Integer i = low - 1;
+//        for (Integer j=low;j<high;j++){
+//            System.out.println("Step 7");
+//                System.out.println(" arr.get(j): "+ arr.get(j));
+//               if (arr.get(j) <= pivot){
+//                   System.out.println("Step 8");
+//                   i++;
+//
+//                   // swap elements
+//                   Integer temp = arr.get(i);
+//                   arr.set(i,arr.get(j));
+//                   arr.set(j,temp);
+//                   System.out.println("Temp :" +arr);
+//               }
+//        }
+//        System.out.println("Step 9");
+//        Integer temp = arr.get(i+1);
+//        arr.set(i+1,arr.get(high));
+//        arr.set(high,temp);
+//        System.out.println("Temp1 :"+arr);
+//        return i+1;
+//    }
 
+    // quick sort
+    @GetMapping("/quickSort")
+    public void quickSort(
+            @RequestParam Integer n
+    ){
+        List<Integer> arr =  Arrays.asList(5,2,8,1,3);
+        quickSortTest(arr,0,arr.size() - 1);
+        System.out.println("Sorted array: " + arr);
+    }
 
+    public void quickSortTest(List<Integer> arr,Integer low, Integer high){
+        if (low < high){
+            int pivotIndex = partition(arr,low,high);
 
+            quickSortTest(arr,low,pivotIndex - 1);
 
+            quickSortTest(arr, pivotIndex + 1, high);
+        }
+    }
 
+    public int partition(List<Integer> arr, Integer low, Integer high){
+        int pivot = arr.get(high);
 
+        int i = low - 1;
 
+        for (int j = low;j<high;j++){
+            if (arr.get(j) <= pivot){
+                i++;
 
+                //swap elements
+                int temp = arr.get(i);
+                arr.set(i,arr.get(j));
+                arr.set(j,temp);
+            }
+        }
+//        System.out.println(pivot);
 
+        int temp = arr.get(i+1);
+        arr.set(i+1,arr.get(high));
+        arr.set(high,temp);
 
-
-
-
-
-
-
-
-
-
-
-
-
+        return i+1;
+    }
 
     @GetMapping("/removeDuplicateCharecters")
     public void removeDuplicateCharecters(

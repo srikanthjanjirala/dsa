@@ -1,31 +1,32 @@
 services:
   mysql:
     image: mysql:8.1
-    container_name: mysql
+    container_name: dsa-mysql
     restart: always
     ports:
       - "3307:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: temp_db
-    #      MYSQL_DATABASE: livestock_microservices_user
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql:/docker-entrypoint-initdb.d
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "mysql", "-uroot", "-proot"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  redis: # 👈 ADD HERE
+  redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
 
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: dsa-app
     restart: always
     ports:
@@ -36,5 +37,29 @@ services:
       mysql:
         condition: service_healthy
 
+  prometheus:
+    image: prom/prometheus
+    container_name: dsa-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./src/main/resources/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    depends_on:
+      - app
+    networks:
+      - default
+
+  grafana:
+    image: grafana/grafana
+    container_name: dsa-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+
 volumes:
   mysql_data:
+  grafana-data:
